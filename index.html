@@ -1,179 +1,54 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pulsanti con Protezione Password</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background-color: #f4f4f9;
-    }
-
-    .controlli {
-      background-color: white;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    input {
-      padding: 10px;
-      font-size: 14px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-
-    .input-testo {
-      flex: 1;
-      min-width: 160px;
-    }
-
-    .input-pass {
-      width: 140px;
-      border-color: #ffc107;
-      background-color: #fffdf5;
-    }
-
-    button {
-      padding: 10px 15px;
-      font-size: 14px;
-      cursor: pointer;
-      border: none;
-      border-radius: 4px;
-      background-color: #007bff;
-      color: white;
-      transition: background-color 0.2s;
-    }
-
-    button:hover {
-      background-color: #0056b3;
-    }
-
-    .btn-reset {
-      background-color: #dc3545;
-    }
-
-    .btn-reset:hover {
-      background-color: #c82333;
-    }
-
-    #contenitore-pulsanti {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    .btn-dinamico {
-      background-color: #28a745;
-    }
-
-    .btn-dinamico:hover {
-      background-color: #218838;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matrix - ALBIERO ROBERTO</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;overflow:hidden;height:100vh;width:100vw;font-family:monospace;cursor:pointer}
+canvas{position:absolute;top:0;left:0}
+.center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#0F0;text-align:center;z-index:10;width:90%}
+h1{font-size:clamp(28px,6vw,60px);letter-spacing:8px;font-weight:bold;text-shadow:0 0 10px #0F0,0 0 30px #0F0}
+.status{margin-top:20px;font-size:14px;letter-spacing:3px}
+.cursor{animation:blink.6s infinite}@keyframes blink{50%{opacity:0}}
+#hint{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);color:#0F0;opacity:.6;font-size:12px;letter-spacing:2px;z-index:10}
+</style>
 </head>
 <body>
+<canvas id="c"></canvas>
+<div class="center">
+  <h1 id="name"></h1>
+  <div class="status" id="status">[ CLICCA OVUNQUE PER AVVIARE L'HACK ]</div>
+</div>
+<div id="hint">► AUDIO ON ◄</div>
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight}resize();addEventListener('resize',resize);
+const chars="ｱｲｳｴｵｶｷｸｹｺｻｼ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+let drops=new Array(Math.floor(innerWidth/14)).fill(0).map(()=>Math.random()*-50);
+setInterval(()=>{ctx.fillStyle="rgba(0,0,0,0.05)";ctx.fillRect(0,0,canvas.width,canvas.height);ctx.font="14px monospace";drops.forEach((y,i)=>{ctx.fillStyle=Math.random()>0.99?"#FFF":"#0F0";ctx.fillText(chars[Math.random()*chars.length|0],i*14,y*14);drops[i]=y*14>innerHeight&&Math.random()>0.975?0:y+1})},35);
 
-  <h1>Gestione Pagine e Link</h1>
-  
-  <div class="controlli">
-    <input type="text" id="input-nome" class="input-testo" placeholder="Nome del pulsante" />
-    <input type="text" id="input-file" class="input-testo" placeholder="File di destinazione (.html)" />
-    <!-- Campo per inserire la password di sicurezza -->
-    <input type="password" id="input-password" class="input-pass" placeholder="🔑 Password" />
-    
-    <button onclick="creaNuovoPulsante()">➕ Aggiungi Pulsante</button>
-    <button class="btn-reset" onclick="svuotaMemoria()">🗑️ Cancella Tutti</button>
-  </div>
+let audioCtx=null;
+function initAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)()}
+function tick(f=1000){if(!audioCtx)return;const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='square';o.frequency.value=f+Math.random()*400;g.gain.value=0.12;o.connect(g);g.connect(audioCtx.destination);o.start();g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.06);o.stop(audioCtx.currentTime+0.06)}
+function granted(){[440,554,659].forEach((fr,i)=>{setTimeout(()=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=fr;g.gain.value=0.3;o.connect(g);g.connect(audioCtx.destination);o.start();g.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+0.5);o.stop(audioCtx.currentTime+0.5)},i*150)})}
 
-  <hr>
+const finalText="ALBIERO ROBERTO",hack="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
+let started=false,iter=0,sIdx=0;
+const nameEl=document.getElementById('name'),statusEl=document.getElementById('status');
+const statuses=["[ SCANSIONE RETE... ]","[ BYPASS FIREWALL... 27% ]","[ BYPASS FIREWALL... 68% ]","[ ACCESSO MAINFRAME... ]","[ DECODIFICA... ]","[ ACCESSO CONCESSO ]"];
 
-  <h3>Pulsanti Salvati:</h3>
-  <div id="contenitore-pulsanti"></div>
-
-  <script>
-    // Imposta qui la tua password personale
-    const PASSWORD_CORRETTA = "protostomo";
-
-    const CONTENITORE = document.getElementById('contenitore-pulsanti');
-
-    // Caricamento iniziale dei pulsanti
-    window.onload = function() {
-      const listaSalvata = JSON.parse(localStorage.getItem('listaPulsanti')) || [];
-      listaSalvata.forEach(pulsanteData => {
-        disegnaPulsante(pulsanteData.nome, pulsanteData.file);
-      });
-    };
-
-    function disegnaPulsante(nome, file) {
-      const nuovoPulsante = document.createElement('button');
-      nuovoPulsante.textContent = nome;
-      nuovoPulsante.className = "btn-dinamico";
-
-      nuovoPulsante.onclick = function() {
-        window.location.href = file;
-      };
-
-      CONTENITORE.appendChild(nuovoPulsante);
-    }
-
-    function creaNuovoPulsante() {
-      const inputNome = document.getElementById('input-nome');
-      const inputFile = document.getElementById('input-file');
-      const inputPassword = document.getElementById('input-password');
-
-      // 1. Verifica della Password
-      if (inputPassword.value !== PASSWORD_CORRETTA) {
-        alert("⚠️ Password errata! Impossibile aggiungere il pulsante.");
-        inputPassword.value = '';
-        return;
-      }
-
-      const nomeValore = inputNome.value.trim();
-      let fileValore = inputFile.value.trim();
-
-      if (nomeValore === '' || fileValore === '') {
-        alert("Inserisci sia il nome del pulsante sia il file di destinazione!");
-        return;
-      }
-
-      if (!fileValore.endsWith('.html')) {
-        fileValore += '.html';
-      }
-
-      // 2. Creazione e salvataggio
-      disegnaPulsante(nomeValore, fileValore);
-
-      const listaSalvata = JSON.parse(localStorage.getItem('listaPulsanti')) || [];
-      listaSalvata.push({ nome: nomeValore, file: fileValore });
-      localStorage.setItem('listaPulsanti', JSON.stringify(listaSalvata));
-
-      // 3. Svuotamento dei campi di testo
-      inputNome.value = '';
-      inputFile.value = '';
-      inputPassword.value = '';
-    }
-
-    function svuotaMemoria() {
-      const passInserita = prompt("🔑 Inserisci la password per confermare la cancellazione:");
-
-      if (passInserita === PASSWORD_CORRETTA) {
-        localStorage.removeItem('listaPulsanti');
-        CONTENITORE.innerHTML = '';
-        alert("Tutti i pulsanti sono stati cancellati.");
-      } else if (passInserita !== null) {
-        alert("⚠️ Password errata! Operazione annullata.");
-      }
-    }
-  </script>
-
+function start(){if(started)return;started=true;initAudio();document.getElementById('hint').style.display='none';
+ setInterval(()=>{if(sIdx<statuses.length){statusEl.textContent="> "+statuses[sIdx];tick(600+sIdx*80);sIdx++}},650);
+ const iv=setInterval(()=>{
+   let out="";for(let i=0;i<finalText.length;i++){out+=finalText[i]==" "?" ":i<iter?finalText[i]:hack[Math.random()*hack.length|0]}
+   nameEl.innerHTML=out+'<span class="cursor">_</span>';if(Math.random()>0.3)tick(1100+Math.random()*800);
+   if(iter>=finalText.length){clearInterval(iv);granted();statusEl.innerHTML="> SYSTEM ACCESS GRANTED - BENVENUTO ALBIERO ROBERTO";statusEl.style.textShadow="0 0 10px #0F0"}
+   iter+=0.45;
+ },65);
+}
+addEventListener('click',start);addEventListener('touchstart',start);
+</script>
 </body>
 </html>
