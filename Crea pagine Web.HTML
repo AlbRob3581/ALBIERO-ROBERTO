@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Creatore Pagine EDITABILE</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,sans-serif}
+body{display:flex;height:100vh;background:#0f1115;color:#eee}
+#left{width:400px;background:#171a21;border-right:1px solid #2a2f3a;padding:18px;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
+#right{flex:1;display:flex;flex-direction:column}
+h2{font-size:13px;letter-spacing:1px;text-transform:uppercase;color:#8b95a8;margin-top:6px}
+label{font-size:11px;color:#9aa5b8;display:block;margin:10px 0 4px;text-transform:uppercase;letter-spacing:.6px}
+input,select,textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #2a2f3a;background:#0f1115;color:#fff;outline:none}
+.row{display:flex;gap:8px}.row>*{flex:1}
+button{padding:11px 14px;border-radius:12px;border:0;cursor:pointer;font-weight:700;transition:.15s}
+.btn-primary{background:#e60000;color:#fff}.btn-primary:hover{background:#ff1a1a}
+.btn-ghost{background:#222834;color:#cbd5e1;border:1px solid #2a2f3a}
+.btn-ghost:hover{background:#2a3242}
+.btn-small{padding:6px 10px;font-size:12px;border-radius:8px}
+#buttonsList{display:flex;flex-direction:column;gap:8px}
+.item{background:#1f2531;border:1px solid #2a3242;border-radius:12px;padding:10px;display:flex;justify-content:space-between;align-items:center}
+.item b{font-size:13px;display:block;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item small{color:#8b95a8;font-size:11px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.colorDot{width:14px;height:14px;border-radius:50%;border:2px solid #fff2;flex-shrink:0}
+#previewWrap{flex:1;padding:20px;overflow:auto;display:grid;place-items:center;background:radial-gradient(ellipse at top,#1a1f2e,transparent),#0f1115}
+#preview{width:min(900px,95%);min-height:500px;background:#fff;border-radius:22px;padding:40px;color:#111;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+#preview.btns{display:flex;flex-wrap:wrap;gap:14px}
+.genBtn{padding:14px 22px;border-radius:14px;text-decoration:none;font-weight:800;display:inline-block;min-width:120px;text-align:center}
+#toolbar{display:flex;flex-wrap:wrap;gap:10px;padding:12px 18px;background:#171a21;border-bottom:1px solid #2a2f3a}
+#codeOut{height:160px;background:#0a0c10;color:#c9d1d9;font-family:monospace;font-size:12px;white-space:pre;overflow:auto;padding:12px;display:none}
+.editBtns{display:flex;gap:6px}
+.uploadArea{border:1.5px dashed #2a3242;border-radius:12px;padding:14px;text-align:center;background:#1a2030;cursor:pointer}
+.uploadArea:hover{border-color:#e60000;background:#201a1a}
+</style>
+</head>
+<body>
+<div id="left">
+  <h2>📂 Modifica pagina esistente</h2>
+  <div class="uploadArea" onclick="document.getElementById('fileInput').click()">
+    Clicca per caricare un file.html creato prima<br><small style="color:#8b95a8">importa titolo, intro e pulsanti</small>
+  </div>
+  <input type="file" id="fileInput" accept=".html,.htm" style="display:none">
+
+  <h2>⚙️ Pagina</h2>
+  <div>
+    <label>Titolo</label><input id="pageTitle" value="Le mie pagine">
+    <label>Colore sfondo</label><input id="bgColor" type="color" value="#ffffff">
+    <label>Testo introduttivo</label><textarea id="intro" rows="2"></textarea>
+  </div>
+
+  <h2>🔘 Pulsante</h2>
+  <div>
+    <label>Testo</label><input id="btnText" placeholder="Es: Pagina di Gabriele">
+    <label>Link file html</label><input id="btnLink" placeholder="gabriele.html">
+    <div class="row">
+      <div><label>Colore pulsante</label><input id="btnColor" type="color" value="#e60000"></div>
+      <div><label>Colore testo</label><input id="txtColor" type="color" value="#ffffff"></div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn-primary" onclick="addButton()">+ Aggiungi</button>
+      <button class="btn-ghost" id="updateBtn" style="display:none" onclick="confirmUpdate()">✔️ Aggiorna</button>
+      <button class="btn-ghost" onclick="clearForm()">Annulla</button>
+    </div>
+  </div>
+
+  <h2>📋 Pulsanti (<span id="count">0</span>)</h2>
+  <div id="buttonsList"></div>
+</div>
+
+<div id="right">
+  <div id="toolbar">
+    <button class="btn-primary" onclick="downloadHTML()">⬇️ Salva.html</button>
+    <button class="btn-ghost" onclick="copyCode()">📋 Copia codice</button>
+    <button class="btn-ghost" onclick="toggleCode()">👁️ Codice</button>
+    <button class="btn-ghost" onclick="if(confirm('Resettare tutto?')){buttons=[];render()}">🗑️ Reset</button>
+  </div>
+  <div id="previewWrap"><div id="preview"></div></div>
+  <div id="codeOut"></div>
+</div>
+
+<script>
+let buttons=[]; let editId=null;
+const $=id=>document.getElementById(id);
+
+function addButton(){
+  const text=$('btnText').value.trim(), link=$('btnLink').value.trim();
+  const color=$('btnColor').value, txt=$('txtColor').value;
+  if(!text||!link){alert('Metti testo e link');return}
+  buttons.push({id:Date.now(),text,link,color,txt}); clearForm(); render();
+}
+function editButton(id){
+  const b=buttons.find(x=>x.id===id); if(!b)return;
+  editId=id;
+  $('btnText').value=b.text; $('btnLink').value=b.link;
+  $('btnColor').value=b.color; $('txtColor').value=b.txt;
+  $('updateBtn').style.display='inline-block';
+  window.scrollTo(0,0);
+}
+function confirmUpdate(){
+  const idx=buttons.findIndex(x=>x.id===editId); if(idx<0)return;
+  buttons[idx]={id:editId,text:$('btnText').value.trim(),link:$('btnLink').value.trim(),color:$('btnColor').value,txt:$('txtColor').value};
+  clearForm(); render();
+}
+function removeButton(id){buttons=buttons.filter(b=>b.id!==id); if(editId===id)clearForm(); render()}
+function clearForm(){editId=null;$('btnText').value='';$('btnLink').value='';$('updateBtn').style.display='none';$('btnColor').value='#e60000';$('txtColor').value='#ffffff'}
+
+function render(){
+  $('count').textContent=buttons.length;
+  $('buttonsList').innerHTML=buttons.map(b=>`
+    <div class="item">
+      <div style="display:flex;gap:10px;align-items:center"><div class="colorDot" style="background:${b.color}"></div><div><b>${b.text}</b><small>${b.link}</small></div></div>
+      <div class="editBtns"><button class="btn-ghost btn-small" onclick="editButton(${b.id})">✏️</button><button class="btn-ghost btn-small" onclick="removeButton(${b.id})">✕</button></div>
+    </div>`).join('');
+  const title=$('pageTitle').value||'Le mie pagine', bg=$('bgColor').value, intro=$('intro').value;
+  $('preview').style.background=bg;
+  $('preview').innerHTML=`<h1 style="font-size:clamp(24px,4vw,42px);margin-bottom:12px">${title}</h1>${intro?`<p style="margin-bottom:22px;color:#444">${intro}</p>`:''}<div class="btns">${buttons.map(b=>`<a href="${b.link}" class="genBtn" style="background:${b.color};color:${b.txt}">${b.text}</a>`).join('')||'<span style="color:#999">Nessun pulsante...</span>'}</div>`;
+  $('codeOut').textContent=generateHTML();
+}
+function generateHTML(){
+  const title=$('pageTitle').value||'Le mie pagine', bg=$('bgColor').value, intro=$('intro').value;
+  return `<!DOCTYPE html>
+<html lang="it">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${title}</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{background:${bg};font-family:system-ui,sans-serif;min-height:100vh;display:grid;place-items:center;padding:30px}.container{max-width:900px;width:100%;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-radius:24px;padding:40px;box-shadow:0 20px 60px rgba(0,0,0,.15)}h1{font-size:clamp(26px,4vw,44px);margin-bottom:12px}p{color:#555;margin-bottom:24px}.btns{display:flex;flex-wrap:wrap;gap:14px}.btn{padding:15px 26px;border-radius:14px;text-decoration:none;font-weight:800;display:inline-block;transition:.18s;min-width:130px;text-align:center}.btn:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 10px 20px rgba(0,0,0,.2)}</style>
+</head>
+<body><div class="container"><h1>${title}</h1>${intro?`<p>${intro}</p>`:''}<div class="btns">
+${buttons.map(b=>` <a href="${b.link}" class="btn" style="background:${b.color};color:${b.txt}">${b.text}</a>`).join('\n')}
+</div></div></body></html>`;
+}
+function downloadHTML(){const blob=new Blob([generateHTML()],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=( $('pageTitle').value||'pagina').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.html';a.click()}
+function copyCode(){navigator.clipboard.writeText(generateHTML());alert('Copiato!')}
+function toggleCode(){const c=$('codeOut');c.style.display=c.style.display==='block'?'none':'block'}
+
+// --- NUOVO: CARICA E MODIFICA PAGINA ESISTENTE ---
+$('fileInput').addEventListener('change', async e=>{
+  const file=e.target.files[0]; if(!file)return;
+  const text=await file.text();
+  try{
+    const doc=new DOMParser().parseFromString(text,'text/html');
+    const title=doc.querySelector('title')?.textContent||'Le mie pagine';
+    $('pageTitle').value=title.trim();
+
+    // prova a leggere bg dal body o dallo style
+    const bodyStyle=doc.querySelector('body')?.getAttribute('style')||'';
+    const bgMatch=text.match(/body\{[^}]*background:\s*([^;}\s]+)/i);
+    if(bgMatch) $('bgColor').value=rgbToHex(bgMatch[1])||'#ffffff';
+
+    // intro = primo p
+    const p=doc.querySelector('.container p')||doc.querySelector('p');
+    if(p) $('intro').value=p.textContent.trim();
+
+    // pulsanti = tutti gli <a> dentro.btns o.container
+    const links=[...doc.querySelectorAll('a.btn,.btns a,.container a')];
+    buttons=links.map(a=>{
+      const style=a.getAttribute('style')||'';
+      const bgCol=(style.match(/background:\s*([^;]+)/i)?.[1]||'#e60000').trim();
+      const txtCol=(style.match(/color:\s*([^;]+)/i)?.[1]||'#ffffff').trim();
+      return {id:Date.now()+Math.random(), text:a.textContent.trim(), link:a.getAttribute('href')||'#', color:rgbToHex(bgCol)||bgCol, txt:rgbToHex(txtCol)||txtCol}
+    }).filter(b=>b.text && b.link);
+
+    render();
+    alert(`Caricata! Trovati ${buttons.length} pulsanti da modificare.`);
+  }catch(err){alert('Errore lettura file: '+err.message)}
+});
+function rgbToHex(c){
+  if(!c) return null;
+  if(c.startsWith('#')) return c;
+  const m=c.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/i);
+  if(!m) return null;
+  return '#'+m.slice(1,4).map(x=>{const h=parseInt(x).toString(16);return h.length==1?'0'+h:h}).join('');
+}
+$('pageTitle').addEventListener('input',render);$('bgColor').addEventListener('input',render);$('intro').addEventListener('input',render);
+render();
+</script>
+</body>
+</html>
