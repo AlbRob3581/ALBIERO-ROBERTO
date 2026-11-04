@@ -1,73 +1,86 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Strumenti Albiero Roberto</title>
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        
-        body{
-            background:#3e3c3c;
-            font-family:system-ui,sans-serif;
-            min-height:100vh;
-            display:flex;
-            justify-content:center;
-            align-items:flex-start;
-            padding:24px 24px 40px 24px;
-        }
-        
-        /* Imposta lo sfondo grigio chiaro direttamente su tutta la card #e2e8f0 al posto di #6494D9*/
-        .card{
-            max-width:900px;
+<!DOCTYPE html><html lang="it"><head>    <meta charset="UTF-8">    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title>Strumenti Albiero Roberto</title>    <style>        *{margin:0;padding:0;box-sizing:border-box}                body{            background:#3e3c3c;            font-family:system-ui,sans-serif;            min-height:100vh;            display:flex;            justify-content:center;            align-items:flex-start;            padding:24px 24px 40px 24px;        }                /* Imposta lo sfondo grigio chiaro direttamente su tutta la card #e2e8f0 al posto di #6494D9*/        .card{            max-width:900px;            width:100%;            background:#6494D9; /* Cambia questo valore esadecimale per regolare la tonalità di grigio */            border-radius:12px;            padding:40px;            box-shadow:0 20px 60px rgba(0,0,0,.15);        }
+        h1{font-size:clamp(26px,4vw,42px);margin-bottom:15px}        p{color:#555;margin-bottom:20px}        label.small{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:block}        
+        /* Stili per il campo di ricerca */
+        .search-container{margin-bottom:20px}
+        .search-input{
             width:100%;
-            background:#6494D9; /* Cambia questo valore esadecimale per regolare la tonalità di grigio */
+            padding:14px;
             border-radius:12px;
-            padding:40px;
-            box-shadow:0 20px 60px rgba(0,0,0,.15);
+            border:2px solid #e5e7eb;
+            font-size:15px;
+            font-weight:600;
+            outline:none;
+            transition:.2s;
         }
+        .search-input:focus{border-color:#e60000;box-shadow:0 0 8px rgba(230,0,0,0.2)}
 
-        h1{font-size:clamp(26px,4vw,42px);margin-bottom:15px}
-        p{color:#555;margin-bottom:20px}
-        label.small{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:block}
-        select{width:100%;padding:15px;border-radius:12px;border:2px solid #e5e7eb;font-weight:700;font-size:15px;background:#fff}
-        select:focus{border-color:#e60000;outline:none}
-        .btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:40px}
-        .btn{padding:14px 22px;border-radius:12px;text-decoration:none;font-weight:800;display:inline-block;transition:.18s;min-width:120px;text-align:center}
-        .btn:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(0,0,0,.15)}
-    </style>
-</head>
-<body>
-    <div class="card">
-        <h1>Strumenti Albiero Roberto</h1>
-        <div>
-            <label class="small">Vai a:</label>
-            <select onchange="if(this.value) window.location.href=this.value">
-                <option value="">Albiero Roberto</option>
-                <option value="Matrix ha te.html">Matrix</option>
-                <option value="https://www.carloacutis.com/it/association">Carlo Acutis</option>
-                <option value="Bibbia.pdf">Bibbia</option>
-                <option value="u485installation.pdf">Driver USB-RS485</option>
-                <option value="MEC. - Contatti e orari.pdf">Comunicazione Salesiani</option>
-                <option value="Contatti Coca-Cola HBC.pdf">Comunicazione Coca-Cola HBC.pdf</option>
-            </select>
+        select{width:100%;padding:15px;border-radius:12px;border:2px solid #e5e7eb;font-weight:700;font-size:15px;background:#fff}        select:focus{border-color:#e60000;outline:none}        .btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:40px;align-items:flex-start}        .btn-wrapper{display:inline-block} /* Wrapper per gestire bottone + immagine associata */
+        .btn{padding:14px 22px;border-radius:12px;text-decoration:none;font-weight:800;display:inline-block;transition:.18s;min-width:120px;text-align:center}        .btn:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(0,0,0,.15)}    </style></head><body>    <div class="card">        <h1>Strumenti Albiero Roberto</h1>        
+        <!-- Campo di ricerca inserito -->
+        <div class="search-container">
+            <label class="small" for="searchInput">Cerca tra i pulsanti e il menù:</label>
+            <input type="text" id="searchInput" class="search-input" placeholder="Digita per filtrare..." oninput="filtrarContenuto()">
         </div>
-        <div class="btns">
-            <a href="Configurazione Connessioni di Albiero Robertov0_2.html" class="btn" style="background:#e60000;color:#ffffff">Configurazione Connessioni con file batch</a>
-            <a href="calcolo tempo.HTML" class="btn" style="background:#ebee20;color:#0a0a0a">Calcolo tempo</a>
-            <a href="Crea pagine Web pulsanti e tendina.HTML" class="btn" style="background:#112aee;color:#f0eaea">Crea pagine Web pulsanti e tendina</a>
-            <a href="Bibbia.pdf" download class="btn" style="background:#4A8538;color:#0a0a0a">Bibbia</a>
-       <a href="#" class="btn" style="background:#4A8538;color:#0a0a0a" onclick="let i = document.getElementById('img1'); i.style.display = i.style.display === 'none' ? 'block' : 'none'; return false;">Dottore</a>
 
-<img id="img1" src="Luca_Fazion.jpg" style="display:none;" width="300">
+        <div>            <label class="small">Vai a:</label>            <select id="menuSelect" onchange="if(this.value) window.location.href=this.value">
+            <option value="">Albiero Roberto</option>
+            <option value="Matrix ha te.html">Matrix</option>
+            <option value="https://www.carloacutis.com/it/association">Carlo Acutis</option>
+            <option value="Bibbia.pdf">Bibbia</option>
+            <option value="u485installation.pdf">Driver USB-RS485</option>
+            <option value="MEC. - Contatti e orari.pdf">Comunicazione Salesiani</option>
+            <option value="Contatti Coca-Cola HBC.pdf">Comunicazione Coca-Cola HBC.pdf</option>
+            
+        </select>        </div>        <div class="btns">            <div class="btn-wrapper"><a href="Configurazione Connessioni di Albiero Robertov0_2.html" class="btn" style="background:#e60000;color:#ffffff">Configurazione Connessioni con file batch</a></div>            <div class="btn-wrapper"><a href="calcolo tempo.HTML" class="btn" style="background:#ebee20;color:#0a0a0a">Calcolo tempo</a></div>            <div class="btn-wrapper"><a href="Crea pagine Web pulsanti e tendina.HTML" class="btn" style="background:#112aee;color:#f0eaea">Crea pagine Web pulsanti e tendina</a></div>            <div class="btn-wrapper"><a href="Bibbia.pdf" download class="btn" style="background:#4A8538;color:#0a0a0a">Bibbia</a></div>       
+            <div class="btn-wrapper">
+                <a href="#" class="btn" style="background:#4A8538;color:#0a0a0a" onclick="let i = document.getElementById('img1'); i.style.display = i.style.display === 'none' ? 'block' : 'none'; return false;">Dottore</a>
+                <img id="img1" src="Luca_Fazion.jpg" style="display:none;" width="300">
+            </div>
 
-<br>
+            <div class="btn-wrapper">
+                <a href="#" class="btn" style="background:#4A8538;color:#0a0a0a" onclick="let i = document.getElementById('img2'); i.style.display = i.style.display === 'none' ? 'block' : 'none'; return false;">Scuola - Materie</a>
+                <img id="img2" src="materie scolastiche.jpg" style="display:none;" width="300">
+           
+            <a href="MEC. - Contatti e orari.pdf" download class="btn" style="background:#36B3BA;color:#EB2617">Comunicazione Salesiani</a>
+            </div>
+        </div>    </div>
 
-<a href="#" class="btn" style="background:#4A8538;color:#0a0a0a" onclick="let i = document.getElementById('img2'); i.style.display = i.style.display === 'none' ? 'block' : 'none'; return false;">Scuola - Materie</a>
 
-<img id="img2" src="materie scolastiche.jpg" style="display:none;" width="300">
-<a href="MEC. - Contatti e orari.pdf" download class="btn" style="background:#36B3BA;color:#EB2617">Comunicazione Salesiani</a>
-        </div>
-    </div>
-</body>
-</html>
+
+            
+            <script>
+        function filtrarContenuto() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            // 1. Filtra i pulsanti
+            const btnWrappers = document.querySelectorAll('.btn-wrapper');
+            btnWrappers.forEach(wrapper => {
+                const btn = wrapper.querySelector('.btn');
+                const text = btn.textContent.toLowerCase();
+                if (text.includes(query)) {
+                    wrapper.style.display = '';
+                } else {
+                    wrapper.style.display = 'none';
+                    // Nasconde l'immagine associata se il pulsante viene nascosto
+                    const img = wrapper.querySelector('img');
+                    if(img) img.style.display = 'none';
+                }
+            });
+
+            // 2. Filtra il menù a tendina
+            const select = document.getElementById('menuSelect');
+            const options = select.querySelectorAll('option');
+            options.forEach((opt, index) => {
+                // Mantiene sempre visibile la prima opzione (placeholder/titolo)
+                if (index === 0) return;
+                
+                const text = opt.textContent.toLowerCase();
+                if (text.includes(query)) {
+                    opt.style.display = '';
+                } else {
+                    opt.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body></html>
