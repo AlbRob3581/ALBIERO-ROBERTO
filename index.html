@@ -1,11 +1,8 @@
-
-index (1).html
-100%
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Strumenti Albiero Roberto</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
@@ -16,41 +13,83 @@ index (1).html
             display:flex;
             justify-content:center;
             align-items:flex-start;
-            padding:24px 24px 40px 24px;
+            padding:12px;
         }
-        /* Impostato lo sfondo grigio chiaro richiesto nei commenti */
         .card{
             max-width:900px;
             width:100%;
             background:#e2e8f0; 
             border-radius:12px;
-            padding:40px;
+            padding:20px;
             box-shadow:0 20px 60px rgba(0,0,0,.15);
         }
-        h1{font-size:clamp(26px,4vw,42px);margin-bottom:15px;color:#1e293b;}
+        h1{font-size:clamp(22px,6vw,42px);margin-bottom:12px;color:#1e293b;line-height:1.2;word-wrap:break-word}
         p{color:#555;margin-bottom:20px}
         label.small{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:block}
         
-        .search-container{margin-bottom:20px}
+        .search-container{margin-bottom:16px}
         .search-input{
             width:100%;
             padding:14px;
             border-radius:12px;
             border:2px solid #cbd5e1;
-            font-size:15px;
+            font-size:16px; /* 16px evita lo zoom automatico su iPhone */
             font-weight:600;
             outline:none;
             transition:.2s;
             background:#fff;
         }
         .search-input:focus{border-color:#e60000;box-shadow:0 0 8px rgba(230,0,0,0.2)}
-        select{width:100%;padding:15px;border-radius:12px;border:2px solid #cbd5e1;font-weight:700;font-size:15px;background:#fff}
+        select{
+            width:100%;
+            padding:14px;
+            border-radius:12px;
+            border:2px solid #cbd5e1;
+            font-weight:700;
+            font-size:16px;
+            background:#fff;
+            max-width:100%;
+        }
         select:focus{border-color:#e60000;outline:none}
         
-        .btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:40px;align-items:flex-start}
-        .btn-wrapper{display:inline-block} 
-        .btn{padding:14px 22px;border-radius:12px;text-decoration:none;font-weight:800;display:inline-block;transition:.18s;min-width:120px;text-align:center}
+        .btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px;align-items:flex-start}
+        .btn-wrapper{flex:1 1 auto; min-width:0} 
+        .btn{
+            padding:14px 16px;
+            border-radius:12px;
+            text-decoration:none;
+            font-weight:800;
+            display:block;
+            width:100%;
+            transition:.18s;
+            text-align:center;
+            font-size:15px;
+            line-height:1.3;
+            word-wrap:break-word;
+        }
         .btn:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(0,0,0,.15)}
+        .btn-wrapper img{
+            display:none;
+            margin-top:8px;
+            width:100%;
+            max-width:300px;
+            height:auto;
+            border-radius:8px;
+        }
+
+        /* --- FIX SMARTPHONE --- */
+        @media (max-width: 600px){
+            body{padding:8px}
+            .card{padding:16px;border-radius:10px}
+            .btns{flex-direction:column;gap:10px}
+            .btn-wrapper{width:100%;flex:none}
+            .btn{padding:16px 12px;font-size:16px}
+            .btn-wrapper img{max-width:100%}
+        }
+        @media (min-width: 601px){
+            .btn-wrapper{flex:1 1 220px; max-width:calc(50% - 6px)}
+            .btn{display:inline-block;width:100%}
+        }
     </style>
 </head>
 <body>
@@ -83,18 +122,17 @@ index (1).html
         <div class="btn-wrapper"><a href="Bibbia.pdf" download class="btn" style="background:#4A8538;color:#0a0a0a">Bibbia</a></div>
         
         <div class="btn-wrapper">
-            <a href="#" class="btn" style="background:#4A8538;color:#0a0a0a" onclick="let i = document.getElementById('img1'); i.style.display = i.style.display === 'none' ? 'block' : 'none'; return false;">Dottore</a>
-            <img id="img1" src="Luca_Fazion.jpg" style="display:none; margin-top: 8px;" width="300">
+            <a href="#" class="btn" style="background:#4A8538;color:#0a0a0a" onclick="let i = document.getElementById('img1'); i.style.display = i.style.display === 'none' || i.style.display === '' ? 'block' : 'none'; return false;">Dottore</a>
+            <img id="img1" src="Luca_Fazion.jpg">
         </div>
         
         <div class="btn-wrapper">
-            <a href="#" class="btn" style="background:#4A8538;color:#0a0a0a" onclick="let i = document.getElementById('img2'); i.style.display = i.style.display === 'none' ? 'block' : 'none'; return false;">Scuola - Materie</a>
-            <img id="img2" src="materie scolastiche.jpg" style="display:none; margin-top: 8px;" width="300">
+            <a href="#" class="btn" style="background:#4A8538;color:#0a0a0a" onclick="let i = document.getElementById('img2'); i.style.display = i.style.display === 'none' || i.style.display === '' ? 'block' : 'none'; return false;">Scuola - Materie</a>
+            <img id="img2" src="materie scolastiche.jpg">
         </div>
 
-        <!-- Separato in un wrapper indipendente per correggere la ricerca -->
         <div class="btn-wrapper">
-            <a href="MEC. - Contatti e orari.pdf" download class="btn" style="background:#36B3BA;color:#EB2617">Comunicazione Salesiani</a>
+            <a href="MEC. - Contatti e orari.pdf" class="btn" style="background:#36B3BA;color:#EB2617">Comunicazione Salesiani</a>
         </div>
     </div>
 </div>
@@ -102,41 +140,27 @@ index (1).html
 <script>
 function filtrarContenuto() {
     const query = document.getElementById('searchInput').value.toLowerCase().trim();
-
-    // 1. Filtra i pulsanti
     const btnWrappers = document.querySelectorAll('.btn-wrapper');
     btnWrappers.forEach(wrapper => {
-        // Cerca tutti i testi dei pulsanti all'interno del wrapper (gestione sicura)
         const btns = wrapper.querySelectorAll('.btn');
         let match = false;
-        
         btns.forEach(btn => {
-            if (btn.textContent.toLowerCase().includes(query)) {
-                match = true;
-            }
+            if (btn.textContent.toLowerCase().includes(query)) match = true;
         });
-
         if (match) {
             wrapper.style.display = '';
         } else {
             wrapper.style.display = 'none';
-            // Nasconde l'immagine associata se il wrapper si nasconde
             const img = wrapper.querySelector('img');
             if(img) img.style.display = 'none';
         }
     });
-
-    // 2. Filtra il menù a tendina
     const select = document.getElementById('menuSelect');
     const options = select.querySelectorAll('option');
     options.forEach((opt, index) => {
-        if (index === 0) return; // Mantiene il titolo
+        if (index === 0) return;
         const text = opt.textContent.toLowerCase();
-        if (text.includes(query)) {
-            opt.style.display = '';
-        } else {
-            opt.style.display = 'none';
-        }
+        opt.style.display = text.includes(query) ? '' : 'none';
     });
 }
 </script>
