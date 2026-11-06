@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comandi CDC - Nogara</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#111827;font-family:system-ui,sans-serif;padding:12px;display:flex;justify-content:center;min-height:100vh}
+  .card{width:100%;max-width:800px;background:#f8fafc;border-radius:16px;padding:20px}
+  h1{font-size:clamp(22px,6vw,28px);color:#0f172a}
+  p.sub{color:#64748b;font-size:14px;margin:4px 0 16px}
+  .search-box{position:relative;margin-bottom:12px}
+  .search-box span{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:18px}
+  #cerca{width:100%;padding:15px 44px;border:2px solid #cbd5e1;border-radius:12px;font-size:16px;background:#fff;outline:none}
+  #cerca:focus{border-color:#e60000}
+  #btnCancella{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:30px;height:30px;border:0;border-radius:50%;background:#e2e8f0;cursor:pointer;display:none}
+  #contatore{font-size:13px;color:#64748b;margin-bottom:10px;font-weight:600}
+  #lista{display:flex;flex-direction:column;gap:8px}
+  .btn{width:100%;text-align:left;padding:14px 16px;border:0;border-radius:12px;background:#fff;cursor:pointer;display:flex;flex-direction:column;gap:3px;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+  .btn:active{transform:scale(.98)}
+  .btn b{font-size:15px;color:#0f172a;word-break:break-word}
+  .btn span{font-size:13px;color:#e60000;font-weight:800;font-family:monospace}
+  .btn small{font-size:11px;color:#64748b}
+  .btn.copiato{background:#16a34a}
+  .btn.copiato b,.btn.copiato span,.btn.copiato small{color:#fff}
+  .carica{width:100%;padding:14px;border-radius:12px;border:2px dashed #94a3b8;background:transparent;font-weight:800;cursor:pointer;margin-bottom:12px;color:#334155}
+  #msg{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:12px 20px;border-radius:99px;font-weight:700;display:none;z-index:99;white-space:nowrap}
+  .vuoto{text-align:center;color:#94a3b8;padding:30px 10px}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Comandi CDC</h1>
+  <p class="sub">Clicca per copiare il codice. Cerca per descrizione o codice.</p>
+
+  <button class="carica" onclick="document.getElementById('fileInput').click()">📂 Carica comandi_CDC.TXT manualmente</button>
+  <input type="file" id="fileInput" accept=".txt,.TXT" onchange="leggiFileSelezionato(event)" style="display:none">
+
+  <div class="search-box">
+    <span>🔍</span>
+    <input type="text" id="cerca" placeholder="Cerca es. FILLER, L208, PALLET..." oninput="filtra()">
+    <button id="btnCancella" onclick="pulisciRicerca()">✕</button>
+  </div>
+
+  <div id="contatore"></div>
+  <div id="lista"><p>Caricamento...</p></div>
+</div>
+<div id="msg">Copiato! ✅</div>
+
+<script>
+let righe = [];
+let filtrate = [];
+
+fetch('comandi_CDC.TXT')
+  .then(r => { if(!r.ok) throw new Error('non trovato'); return r.text(); })
+  .then(t => creaPulsanti(t))
+  .catch(() => {
+    document.getElementById('lista').innerHTML = '<div class="vuoto">File <b>comandi_CDC.TXT</b> non trovato in automatico.<br>Usa il bottone sopra per caricarlo.</div>';
+  });
+
+function leggiFileSelezionato(e){
+  const f = e.target.files[0]; if(!f) return;
+  const rd = new FileReader();
+  rd.onload = ev => creaPulsanti(ev.target.result);
+  rd.readAsText(f);
+}
+
+function creaPulsanti(testo){
+  righe = testo.split(/\r?\n/).map(riga => {
+    // Divide per TAB e toglie i pezzi vuoti
+    let parti = riga.split('\t').map(p => p.trim()).filter(p => p !== '');
+    // Ci aspettiamo: [codice, descrizione]
+    // Scarta intestazioni: Sede tecnica, Descrizione, ecc.
+    if(parti.length < 2) return null;
+    let codice = parti[0];
+    let descrizione = parti[parti.length - 1];
+    // Il codice vero inizia con 6310- oppure è 6310
+    if(!codice.startsWith('6310')) return null;
+    if(descrizione === codice) return null;
+    return { codice, descrizione, originale: codice + ' ' + descrizione };
+  }).filter(x => x !== null);
+  filtra();
+}
+
+function filtra(){
+  const q = document.getElementById('cerca').value.toLowerCase().trim();
+  document.getElementById('btnCancella').style.display = q ? 'block' : 'none';
+  filtrate = !q ? righe : righe.filter(r => r.originale.toLowerCase().includes(q));
+  mostraRighe();
+}
+function pulisciRicerca(){ document.getElementById('cerca').value=''; filtra(); document.getElementById('cerca').focus(); }
+
+function mostraRighe(){
+  const div = document.getElementById('lista');
+  document.getElementById('contatore').textContent = `Mostrati ${filtrate.length} di ${righe.length} codici`;
+  div.innerHTML = '';
+  if(filtrate.length === 0){ div.innerHTML = '<div class="vuoto">🔍 Nessun risultato</div>'; return; }
+  filtrate.forEach(item => {
+    const b = document.createElement('button');
+    b.className = 'btn';
+    b.innerHTML = `<b>${item.descrizione}</b><span>${item.codice}</span><small>Tocca per copiare il codice</small>`;
+    b.onclick = () => copia(item.codice, b);
+    div.appendChild(b);
+  });
+}
+
+async function copia(testo, btn){
+  try{ await navigator.clipboard.writeText(testo); }
+  catch(e){ const ta=document.createElement('textarea'); ta.value=testo; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
+  document.querySelectorAll('.btn').forEach(x=>x.classList.remove('copiato'));
+  btn.classList.add('copiato');
+  const msg = document.getElementById('msg');
+  msg.textContent = 'Copiato: ' + testo + ' ✅';
+  msg.style.display='block';
+  setTimeout(()=>{ btn.classList.remove('copiato'); msg.style.display='none'; }, 1500);
+}
+</script>
+</body>
+</html>
